@@ -6,6 +6,7 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <link rel="stylesheet" href="https://unpkg.com/leaflet@1.7.1/dist/leaflet.css" />
     <script src="https://unpkg.com/leaflet@1.7.1/dist/leaflet.js"></script>
+	<script src="https://cdnjs.cloudflare.com/ajax/libs/chroma-js/2.4.2/chroma.min.js"></script>
     <style>
         /* Make sure the map container has a defined height */
         #map { height: 1000px; }
@@ -37,17 +38,26 @@
                                 popupContent += '<tr><th>' + key + '</th><td>' + feature.properties[key] + '</td></tr>';
                             }
                             popupContent += '</table>';
-                            layer.bindPopup(popupContent);
+                            layer.bindPopup(popupContent,{
+								maxWidth: 500, // Set a maximum width (adjust as needed)
+								minWidth: 150  // Set a minimum width (adjust as needed)
+								}
+							);
                         }
                     },
                     // Style the feature (you can customize this)
-                    style: {
-                        fillColor: '#800026', // Example fill color
-                        color: '#666666', // Example border color
-                        weight: 1,
-                        opacity: 1,
-                        fillOpacity: 0.7
-                    }
+					style: function(feature) {
+						var district = feature.properties.District_Numero;
+						var colorScale = chroma.scale('Spectral').domain([1, 19]); // Creates a color scale
+						var color = colorScale(district).hex(); // Get color for the district
+						 return {
+							fillColor: color,
+							color: '#333',
+							weight: 1,
+							opacity: 1,
+							fillOpacity: 0.7
+						 };
+					},
                 }).addTo(map);
             })
         fetch('ProfilesSV.geojson') //  <=====  The key line
