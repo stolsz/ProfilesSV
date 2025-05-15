@@ -1,0 +1,61 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Leaflet Map with GeoJSON</title>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link rel="stylesheet" href="https://unpkg.com/leaflet@1.7.1/dist/leaflet.css" />
+    <script src="https://unpkg.com/leaflet@1.7.1/dist/leaflet.js"></script>
+    <style>
+        /* Make sure the map container has a defined height */
+        #map { height: 1000px; }
+    </style>
+</head>
+<body>
+    <div id="map"></div>
+
+    <script>
+        // Initialize the map
+        var map = L.map('map').setView([45.4201, -75.7003], 10); // Set initial view (e.g., San Francisco) and zoom
+
+        // Add OpenStreetMap as the base map layer
+        L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
+            attribution: '&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors'
+        }).addTo(map);
+
+        // Load and display the GeoJSON data
+        fetch("ProfilesSV_4326.geojson") // Replace with the actual path to your GeoJSON file
+            .then(response => response.json())
+            .then(data => {
+                // Add the GeoJSON data to the map
+                L.geoJSON(data, {
+                    onEachFeature: function (feature, layer) {
+                        // Create popup content
+                        if (feature.properties) {
+                            var popupContent = '<table>';
+                            for (var key in feature.properties) {
+                                popupContent += '<tr><th>' + key + '</th><td>' + feature.properties[key] + '</td></tr>';
+                            }
+                            popupContent += '</table>';
+                            layer.bindPopup(popupContent);
+                        }
+                    },
+                    // Style the feature (you can customize this)
+                    style: {
+                        fillColor: '#800026', // Example fill color
+                        color: '#666666', // Example border color
+                        weight: 1,
+                        opacity: 1,
+                        fillOpacity: 0.7
+                    }
+                }).addTo(map);
+            })
+        fetch('ProfilesSV.geojson') //  <=====  The key line
+            .then(response => response.json())
+            .then(data => {
+                L.geoJSON(data).addTo(map);
+            })
+            .catch(error => console.error('Error loading GeoJSON:', error));
+    </script>
+</body>
+</html>
