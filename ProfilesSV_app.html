@@ -6,7 +6,7 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <link rel="stylesheet" href="https://unpkg.com/leaflet@1.7.1/dist/leaflet.css" />
     <script src="https://unpkg.com/leaflet@1.7.1/dist/leaflet.js"></script>
-	<script src="https://cdnjs.cloudflare.com/ajax/libs/chroma-js/2.4.2/chroma.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/chroma-js/2.4.2/chroma.min.js"></script>
     <style>
         /* Make sure the map container has a defined height */
         #map { height: 1000px; }
@@ -17,55 +17,162 @@
 
     <script>
         // Initialize the map
-        var map = L.map('map').setView([45.4201, -75.7003], 10); // Set initial view (e.g., San Francisco) and zoom
+        var map = L.map('map').setView([45.4201, -75.7003], 10);
 
         // Add OpenStreetMap as the base map layer
         L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
             attribution: '&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors'
         }).addTo(map);
 
-        // Load and display the GeoJSON data
-        fetch("ProfilesSV_4326.geojson") // Replace with the actual path to your GeoJSON file
+        // Define the first layer: Profiles
+        var profilesLayer = L.geoJSON(null, {
+            style: function(feature) {
+                var indexVote = feature.properties.Index_vote;  // Use Index_vote
+                var colorScale = chroma.scale(['white', 'red']).domain([0, 100]); // White to red, domain 0-100
+                var color = colorScale(indexVote).hex();
+                return {
+                    fillColor: color,
+                    color: '#333',
+                    weight: 1,
+                    opacity: 1,
+                    fillOpacity: 0.7
+                };
+            },
+            onEachFeature: function (feature, layer) {
+                if (feature.properties) {
+                    var popupContent = '<table>';
+                    for (var key in feature.properties) {
+                        popupContent += '<tr><th>' + key + '</th><td>' + feature.properties[key] + '</td></tr>';
+                    }
+                    popupContent += '</table>';
+                    layer.bindPopup(popupContent, {
+                        maxWidth: 500,
+                        minWidth: 150
+                    });
+                }
+            }
+        });
+
+        // Define the second layer: Results
+        var resultsLayer = L.geoJSON(null, {
+            style: function(feature) {
+                var votePercentage = feature.properties["2024_Maude % Vote Total"];
+                var colorScale = chroma.scale(['white', 'blue']).domain([0, 1]);
+                var color = colorScale(votePercentage).hex();
+                return {
+                    fillColor: color,
+                    color: '#333',
+                    weight: 1,
+                    opacity: 0.7,
+                    fillOpacity: 0.7
+                };
+            },
+            onEachFeature: function (feature, layer) {
+                var popupContent = '<b>2024 Vote Results</b><br>';
+                popupContent += 'Maude: ' + feature.properties["2024_Maude % Vote Total"] + '%';
+                layer.bindPopup(popupContent);
+            }
+        });
+
+        // Define the third layer: Decoupage Administratif
+        var decoupageLayer = L.geoJSON(null, {
+            style: function(feature) {
+                return {
+                    fillColor: 'transparent',
+                    color: '#000000',
+                    weight: 2,
+                    opacity: 1,
+                    fillOpacity: 0
+                };
+            },
+            onEachFeature: function (feature, layer) {
+                if (feature.properties) {
+                    var popupContent = '<b>Decoupage Administratif</b><br>';
+                    for (var key in feature.properties) {
+                        popupContent += '<tr><th>' + key + '</th><td>' + feature.properties[key] + '</td></tr>';
+                    }
+                    popupContent += '</table>';
+                    layer.bindPopup(popupContent, {
+                        maxWidth: 500,
+                        minWidth: 150
+                    });
+                }
+            }
+        });
+
+        // Define the fourth layer: Districts Electoraux
+        var districtsLayer = L.geoJSON(null, {
+            style: function(feature) {
+                return {
+                    fillColor: 'transparent',
+                    color: '#000000',
+                    weight: 2,
+                    dashArray: '5, 15',
+                    opacity: 1,
+                    fillOpacity: 0
+                };
+            },
+            onEachFeature: function (feature, layer) {
+                if (feature.properties) {
+                    var popupContent = '<b>Districts Electoraux</b><br>';
+                    for (var key in feature.properties) {
+                        popupContent += '<tr><th>' + key + '</th><td>' + feature.properties[key] + '</td></tr>';
+                    }
+                    popupContent += '</table>';
+                    layer.bindPopup(popupContent, {
+                        maxWidth: 500,
+                        minWidth: 150
+                    });
+                }
+            }
+        });
+
+
+        // Define the layer control
+        var baseMaps = {
+            "Profiles": profilesLayer,
+            "Results": resultsLayer,
+            "Decoupage": decoupageLayer,
+            "Districts": districtsLayer
+        };
+
+        L.control.layers(null, baseMaps).addTo(map);
+
+        // Load GeoJSON data for the layers
+        fetch("ProfilesSV_4326_Index.geojson")
             .then(response => response.json())
             .then(data => {
-                // Add the GeoJSON data to the map
-                L.geoJSON(data, {
-                    onEachFeature: function (feature, layer) {
-                        // Create popup content
-                        if (feature.properties) {
-                            var popupContent = '<table>';
-                            for (var key in feature.properties) {
-                                popupContent += '<tr><th>' + key + '</th><td>' + feature.properties[key] + '</td></tr>';
-                            }
-                            popupContent += '</table>';
-                            layer.bindPopup(popupContent,{
-								maxWidth: 500, // Set a maximum width (adjust as needed)
-								minWidth: 150  // Set a minimum width (adjust as needed)
-								}
-							);
-                        }
-                    },
-                    // Style the feature (you can customize this)
-					style: function(feature) {
-						var district = feature.properties.District_Numero;
-						var colorScale = chroma.scale('Spectral').domain([1, 19]); // Creates a color scale
-						var color = colorScale(district).hex(); // Get color for the district
-						 return {
-							fillColor: color,
-							color: '#333',
-							weight: 1,
-							opacity: 1,
-							fillOpacity: 0.7
-						 };
-					},
-                }).addTo(map);
+                profilesLayer.addData(data);
+                profilesLayer.addTo(map);
             })
-        fetch('ProfilesSV.geojson') //  <=====  The key line
+            .catch(error => console.error('Error loading ProfilesSV_4326.geojson:', error));
+
+        fetch('ResultatsSV_4326.geojson')
             .then(response => response.json())
-            .then(data => {
-                L.geoJSON(data).addTo(map);
+            .then(data2 => {
+                resultsLayer.addData(data2);
+                resultsLayer.addTo(map);
             })
-            .catch(error => console.error('Error loading GeoJSON:', error));
+            .catch(error => console.error('Error loading ResultatsSV_4326.geojson:', error));
+
+        fetch('Decoupage_Administratif_4326.geojson')
+            .then(response => response.json())
+            .then(data3 => {
+                decoupageLayer.addData(data3);
+                decoupageLayer.addTo(map);
+                decoupageLayer.bringToFront();
+            })
+            .catch(error => console.error('Error loading Decoupage_Administratif_4326.geojson:', error));
+
+        fetch('Districts_Electoraux_4326.geojson')
+            .then(response => response.json())
+            .then(data4 => {
+                districtsLayer.addData(data4);
+                districtsLayer.addTo(map);
+                districtsLayer.bringToFront();
+            })
+            .catch(error => console.error('Error loading Districts_Electoraux_4326.geojson:', error));
+
     </script>
 </body>
 </html>
