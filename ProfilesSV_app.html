@@ -139,7 +139,7 @@
         L.control.layers(null, baseMaps).addTo(map);
 
         // Load GeoJSON data for the layers
-        fetch("ProfilesSV_4326_Index.geojson")
+        fetch("ProfilesSV_4326_index.geojson")
             .then(response => response.json())
             .then(data => {
                 profilesLayer.addData(data);
