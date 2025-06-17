@@ -309,13 +309,13 @@
 
 
         // Load GeoJSON data for the layers
-        fetch("ProfilesSV_4326_Index.geojson")
+        fetch("ProfilesSV_4326_index2.geojson")
             .then(response => response.json())
             .then(data => {
                 profilesLayer.addData(data);
                 // profilesLayer.addTo(map); //already added
             })
-            .catch(error => console.error('Error loading ProfilesSV_4326.geojson:', error));
+            .catch(error => console.error('Error loading ProfilesSV_4326_index2.geojson:', error));
 
         fetch('Decoupage_Administratif_4326.geojson')
             .then(response => response.json())
