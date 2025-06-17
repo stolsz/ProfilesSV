@@ -10,6 +10,15 @@
     <style>
         /* Make sure the map container has a defined height */
         #map { height: 1000px; }
+        /* Style for expanded layer control */
+        .leaflet-control-layers-expanded {
+            overflow: auto;
+            height: auto;
+            max-height: 500px; /* You can adjust this max-height as needed */
+        }
+        .leaflet-control-layers-list {
+            padding: 5px;
+        }
     </style>
 </head>
 <body>
@@ -27,15 +36,15 @@
         // Define the first layer: Profiles
         var profilesLayer = L.geoJSON(null, {
             style: function(feature) {
-                var indexVote = feature.properties.Index_vote;  // Use Index_vote
-                var colorScale = chroma.scale(['white', 'red']).domain([0, 100]); // White to red, domain 0-100
+                var indexVote = feature.properties.Index_vote;
+                var colorScale = chroma.scale(['white', 'red']).domain([0, 100]);
                 var color = colorScale(indexVote).hex();
                 return {
                     fillColor: color,
                     color: '#333',
                     weight: 1,
                     opacity: 1,
-                    fillOpacity: 0.7
+                    fillOpacity: 0.5 // Changed to 0.5 for 50%
                 };
             },
             onEachFeature: function (feature, layer) {
@@ -53,26 +62,7 @@
             }
         });
 
-        // Define the second layer: Results
-        var resultsLayer = L.geoJSON(null, {
-            style: function(feature) {
-                var votePercentage = feature.properties["2024_Maude % Vote Total"];
-                var colorScale = chroma.scale(['white', 'blue']).domain([0, 1]);
-                var color = colorScale(votePercentage).hex();
-                return {
-                    fillColor: color,
-                    color: '#333',
-                    weight: 1,
-                    opacity: 0.7,
-                    fillOpacity: 0.7
-                };
-            },
-            onEachFeature: function (feature, layer) {
-                var popupContent = '<b>2024 Vote Results</b><br>';
-                popupContent += 'Maude: ' + feature.properties["2024_Maude % Vote Total"] + '%';
-                layer.bindPopup(popupContent);
-            }
-        });
+
 
         // Define the third layer: Decoupage Administratif
         var decoupageLayer = L.geoJSON(null, {
@@ -82,16 +72,14 @@
                     color: '#000000',
                     weight: 2,
                     opacity: 1,
-                    fillOpacity: 0
+                    fillOpacity: 0.5 // Changed to 0.5 for 50%
                 };
             },
             onEachFeature: function (feature, layer) {
                 if (feature.properties) {
+                    // Modified popupContent to show only 'Nom'
                     var popupContent = '<b>Decoupage Administratif</b><br>';
-                    for (var key in feature.properties) {
-                        popupContent += '<tr><th>' + key + '</th><td>' + feature.properties[key] + '</td></tr>';
-                    }
-                    popupContent += '</table>';
+                    popupContent += 'Nom: ' + feature.properties.NOM;
                     layer.bindPopup(popupContent, {
                         maxWidth: 500,
                         minWidth: 150
@@ -109,16 +97,182 @@
                     weight: 2,
                     dashArray: '5, 15',
                     opacity: 1,
-                    fillOpacity: 0
+                    fillOpacity: 0.5 // Changed to 0.5 for 50%
                 };
             },
             onEachFeature: function (feature, layer) {
                 if (feature.properties) {
+                    // Modified popupContent to show only 'District'
                     var popupContent = '<b>Districts Electoraux</b><br>';
-                    for (var key in feature.properties) {
-                        popupContent += '<tr><th>' + key + '</th><td>' + feature.properties[key] + '</td></tr>';
-                    }
-                    popupContent += '</table>';
+                    popupContent += 'District: ' + feature.properties.DISTRICT;
+                    layer.bindPopup(popupContent, {
+                        maxWidth: 500,
+                        minWidth: 150
+                    });
+                }
+            }
+        });
+
+        // Define the new layers for 2024 Mairie results
+        var mairie2024AGLayer = L.geoJSON(null, {
+            style: function(feature) {
+                var votePercentage = feature.properties["Mairie 2024 % Vote AG"];
+                var colorScale = chroma.scale(['white', 'red']).domain([0, 1]);
+                var color = colorScale(votePercentage).hex();
+                return {
+                    fillColor: color,
+                    color: '#333',
+                    weight: 1,
+                    opacity: 0.7,
+                    fillOpacity: 0.5 // Changed to 0.5 for 50%
+                };
+            },
+            onEachFeature: function (feature, layer) {
+                var popupContent = '<b>Mairie 2024 AG</b><br>';
+                popupContent += 'Vote: ' + feature.properties["Mairie 2024 % Vote AG"] + '%';
+                layer.bindPopup(popupContent);
+            }
+        });
+
+        var mairie2024AdversairesLayer = L.geoJSON(null, {
+            style: function(feature) {
+                var votePercentage = feature.properties["Mairie 2024 % Vote Adversaire"];
+                var colorScale = chroma.scale(['white', 'yellow']).domain([0, 1]);
+                var color = colorScale(votePercentage).hex();
+                return {
+                    fillColor: color,
+                    color: '#333',
+                    weight: 1,
+                    opacity: 0.7,
+                    fillOpacity: 0.5 // Changed to 0.5 for 50%
+                };
+            },
+            onEachFeature: function (feature, layer) {
+                var popupContent = '<b>Mairie 2024 Adversaires</b><br>';
+                popupContent += 'Vote: ' + feature.properties["Mairie 2024 % Vote Adversaire"] + '%';
+                layer.bindPopup(popupContent);
+            }
+        });
+
+        // Define the new layers for 2021 Mairie results
+        var mairie2021AGLayer = L.geoJSON(null, {
+            style: function(feature) {
+                var votePercentage = feature.properties["Mairie 2021 % Vote AG"];
+                var colorScale = chroma.scale(['white', 'red']).domain([0, 1]);
+                var color = colorScale(votePercentage).hex();
+                return {
+                    fillColor: color,
+                    color: '#333',
+                    weight: 1,
+                    opacity: 0.7,
+                    fillOpacity: 0.5 // Changed to 0.5 for 50%
+                };
+            },
+            onEachFeature: function (feature, layer) {
+                var popupContent = '<b>Mairie 2021 AG</b><br>';
+                popupContent += 'Vote: ' + feature.properties["Mairie 2021 % Vote AG"] + '%';
+                layer.bindPopup(popupContent);
+            }
+        });
+
+        var mairie2021AdversairesLayer = L.geoJSON(null, {
+            style: function(feature) {
+                var votePercentage = feature.properties["Mairie 2021 % Vote Adversaire"];
+                var colorScale = chroma.scale(['white', 'yellow']).domain([0, 1]);
+                var color = colorScale(votePercentage).hex();
+                return {
+                    fillColor: color,
+                    color: '#333',
+                    weight: 1,
+                    opacity: 0.7,
+                    fillOpacity: 0.5 // Changed to 0.5 for 50%
+                };
+            },
+            onEachFeature: function (feature, layer) {
+                var popupContent = '<b>Mairie 2021 Adversaires</b><br>';
+                popupContent += 'Vote: ' + feature.properties["Mairie 2021 % Vote Adversaire"] + '%';
+                layer.bindPopup(popupContent);
+            }
+        });
+
+        // Define the new layers for 2021 Districts results
+        var districts2021AGLayer = L.geoJSON(null, {
+            style: function(feature) {
+                var votePercentage = feature.properties["Districts 2021 % Vote AG"];
+                var colorScale = chroma.scale(['white', 'red']).domain([0, 1]);
+                var color = colorScale(votePercentage).hex();
+                return {
+                    fillColor: color,
+                    color: '#333',
+                    weight: 1,
+                    opacity: 0.7,
+                    fillOpacity: 0.5 // Changed to 0.5 for 50%
+                };
+            },
+            onEachFeature: function (feature, layer) {
+                var popupContent = '<b>Districts 2021 AG</b><br>';
+                popupContent += 'Vote: ' + feature.properties["Districts 2021 % Vote AG"] + '%';
+                layer.bindPopup(popupContent);
+            }
+        });
+
+        var districts2021AdversairesLayer = L.geoJSON(null, {
+            style: function(feature) {
+                var votePercentage = feature.properties["Districts 2021 % Vote Adversaires"];
+                var colorScale = chroma.scale(['white', 'yellow']).domain([0, 1]);
+                var color = colorScale(votePercentage).hex();
+                return {
+                    fillColor: color,
+                    color: '#333',
+                    weight: 1,
+                    opacity: 0.7,
+                    fillOpacity: 0.5 // Changed to 0.5 for 50%
+                };
+            },
+            onEachFeature: function (feature, layer) {
+                var popupContent = '<b>Districts 2021 Adversaires</b><br>';
+                popupContent += 'Vote: ' + feature.properties["Districts 2021 % Vote Adversaires"] + '%';
+                layer.bindPopup(popupContent);
+            }
+        });
+
+        // Define the Affection layer
+        var affectationLayer = L.geoJSON(null, {
+            style: function (feature) {
+                var type = feature.properties.TYPE;
+                var color = 'gray'; // Default color
+
+                switch (type) {
+                    case 'Résidentielle':
+                        color = 'green';
+                        break;
+                    case 'Commerciale artérielle':
+                        color = 'blue';
+                        break;
+                    case 'Industriel':
+                        color = 'red';
+                        break;
+                    case 'Récréative':
+                        color = 'orange';
+                        break;
+                    case 'Agricole':
+                        color = 'yellow';
+                        break;
+                    default:
+                        color: 'gray';
+                }
+                return {
+                    fillColor: color,
+                    color: '#333',
+                    weight: 1,
+                    opacity: 0.7,
+                    fillOpacity: 0.5
+                };
+            },
+            onEachFeature: function (feature, layer) {
+                if (feature.properties) {
+                    var popupContent = '<b>Affectation Territoire</b><br>';
+                    popupContent += 'Type: ' + feature.properties.TYPE;
                     layer.bindPopup(popupContent, {
                         maxWidth: 500,
                         minWidth: 150
@@ -128,38 +282,46 @@
         });
 
 
-        // Define the layer control
+        // Define the layer control with all layers initially added, and expand it.
         var baseMaps = {
             "Profiles": profilesLayer,
-            "Results": resultsLayer,
             "Decoupage": decoupageLayer,
-            "Districts": districtsLayer
+            "Districts": districtsLayer,
+            "Mairie 2024 AG": mairie2024AGLayer,
+            "Mairie 2024 Adversaires": mairie2024AdversairesLayer,
+            "Mairie 2021 AG": mairie2021AGLayer,
+            "Mairie 2021 Adversaires": mairie2021AdversairesLayer,
+            "Districts 2021 AG": districts2021AGLayer,
+            "Districts 2021 Adversaires": districts2021AdversairesLayer,
+            "Affectation": affectationLayer //added
         };
 
-        L.control.layers(null, baseMaps).addTo(map);
+        var layerControl = L.control.layers(null, baseMaps, { collapsed: false }); //collaped: false makes it expanded
+        layerControl.addTo(map);
+
+        // Keep only the desired layers turned on by default.
+        profilesLayer.addTo(map);
+        decoupageLayer.addTo(map);
+        districtsLayer.addTo(map);
+
+        // Add a class to the layer control container to make it always expanded
+        layerControl.getContainer().classList.add('leaflet-control-layers-expanded');
+
 
         // Load GeoJSON data for the layers
-        fetch("ProfilesSV_4326_index.geojson")
+        fetch("ProfilesSV_4326_Index2.geojson")
             .then(response => response.json())
             .then(data => {
                 profilesLayer.addData(data);
-                profilesLayer.addTo(map);
+                // profilesLayer.addTo(map); //already added
             })
             .catch(error => console.error('Error loading ProfilesSV_4326.geojson:', error));
-
-        fetch('ResultatsSV_4326.geojson')
-            .then(response => response.json())
-            .then(data2 => {
-                resultsLayer.addData(data2);
-                resultsLayer.addTo(map);
-            })
-            .catch(error => console.error('Error loading ResultatsSV_4326.geojson:', error));
 
         fetch('Decoupage_Administratif_4326.geojson')
             .then(response => response.json())
             .then(data3 => {
                 decoupageLayer.addData(data3);
-                decoupageLayer.addTo(map);
+                //decoupageLayer.addTo(map); //already added
                 decoupageLayer.bringToFront();
             })
             .catch(error => console.error('Error loading Decoupage_Administratif_4326.geojson:', error));
@@ -168,10 +330,51 @@
             .then(response => response.json())
             .then(data4 => {
                 districtsLayer.addData(data4);
-                districtsLayer.addTo(map);
+                //districtsLayer.addTo(map);  //already added
                 districtsLayer.bringToFront();
             })
             .catch(error => console.error('Error loading Districts_Electoraux_4326.geojson:', error));
+
+        // Load the new GeoJSON files and add the layers to the map
+        fetch('ResultatsMairie2024_SV_4326.geojson')
+            .then(response => response.json())
+            .then(data => {
+                mairie2024AGLayer.addData(data);
+                mairie2024AdversairesLayer.addData(data);
+                //map.addLayer(mairie2024AGLayer);  // Dont add to map here, let user add through layer control
+                //map.addLayer(mairie2024AdversairesLayer); // Dont add to map here, let user add through layer control
+
+            })
+            .catch(error => console.error('Error loading ResultatsMairie2024_SV_4326.geojson:', error));
+
+        fetch('ResultatsMairie2021_SV_4326.geojson')
+            .then(response => response.json())
+            .then(data => {
+                mairie2021AGLayer.addData(data);
+                mairie2021AdversairesLayer.addData(data);
+                //map.addLayer(mairie2021AGLayer);   // Dont add to map here, let user add through layer control
+                //map.addLayer(mairie2021AdversairesLayer);  // Dont add to map here, let user add through layer control
+            })
+            .catch(error => console.error('Error loading ResultatsMairie2021_SV_4326.geojson:', error));
+
+        fetch('ResultatsDistricts_2021_SV_4326.geojson')
+            .then(response => response.json())
+            .then(data => {
+                districts2021AGLayer.addData(data);
+                districts2021AdversairesLayer.addData(data);
+                //map.addLayer(districts2021AGLayer);  // Dont add to map here, let user add through layer control
+                //map.addLayer(districts2021AdversairesLayer); // Dont add to map here, let user add through layer control
+            })
+            .catch(error => console.error('Error loading ResultatsDistricts_2021_SV_4326.geojson:', error));
+
+        // Load Affectation layer
+        fetch('Affectation_Territoire_4326.geojson')
+            .then(response => response.json())
+            .then(data => {
+                affectationLayer.addData(data);
+                //map.addLayer(affectationLayer);  // Add the layer, but don't add it to the map by default
+            })
+            .catch(error => console.error('Error loading Affectation_Territoire_4326.geojson:', error));
 
     </script>
 </body>
