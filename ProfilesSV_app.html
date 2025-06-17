@@ -309,7 +309,7 @@
 
 
         // Load GeoJSON data for the layers
-        fetch("ProfilesSV_4326_Index2.geojson")
+        fetch("ProfilesSV_4326_Index.geojson")
             .then(response => response.json())
             .then(data => {
                 profilesLayer.addData(data);
