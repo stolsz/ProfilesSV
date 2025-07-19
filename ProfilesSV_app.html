@@ -96,7 +96,7 @@
 
         var profilesLayer = L.geoJSON(null, {
             style: function(feature) {
-                var indexVote = feature.properties.Predicted_Index_vote;
+                var indexVote = feature.properties.Predicted_Mairie_2026_Vote_AG;
                 // Reverted to original color scheme and domain as per user's request
                 var colorScale = chroma.scale(['white', 'purple']).domain([20, 60]); 
                 return {
@@ -205,7 +205,7 @@
         }
 
         // MODIFICATION: Changed GeoJSON file name for profiles layer
-        loadGeoJSON("predicted_index_vote.geojson", data => profilesLayer.addData(data));
+        loadGeoJSON("predicted_mairie_2026_vote.geojson", data => profilesLayer.addData(data));
         loadGeoJSON('Decoupage_Administratif_4326.geojson', data => decoupageLayer.addData(data));
         loadGeoJSON('Districts_Electoraux_4326.geojson', data => districtsLayer.addData(data));
         loadGeoJSON('Affectation_Territoire_4326.geojson', data => affectationLayer.addData(data));
