@@ -140,11 +140,16 @@
                 var type = feature.properties.TYPE;
                 var color = 'gray'; // Default color
                 switch (type) {
-                    case 'Résidentielle': color = 'green'; break;
-                    case 'Commerciale artérielle': color = 'blue'; break;
+                    case 'Résidentielle': color = 'blue'; break;
+                    case 'Commerciale artérielle': color = 'purple'; break;
                     case 'Industriel': color = 'red'; break;
-                    case 'Récréative': color = 'orange'; break;
+                    case 'Récréative': color = 'lime'; break;
                     case 'Agricole': color = 'yellow'; break;
+					case 'Rurale': color = 'yellow'; break;
+					case 'Multifonctionnelle': color = 'teal'; break;
+					case 'Économique spécialisée': color = 'aqua'; break;
+					case 'Agricole de conservation': color = 'olive'; break;
+					case 'Conservation': color = 'green'; break;
                     // MODIFICATION: Corrected bug here (was "color:", should be "color =")
                     default: color = 'gray';
                 }
@@ -241,12 +246,16 @@
             var electionColors = chroma.scale(['#FFFFE0', '#FF4500']).domain([0, 1]).colors(5); // Example for Action Gatineau
             var electionAdversariesColors = chroma.scale(['#FFFFE0', '#4169E1']).domain([0, 1]).colors(5); // Example for Adversaries
             var affectationColors = {
-                'Résidentielle': 'green',
-                'Commerciale artérielle': 'blue',
-                'Industriel': 'red',
-                'Récréative': 'orange',
-                'Agricole': 'yellow',
-                'Default': 'gray'
+				'Résidentielle': 'blue',
+				'Commerciale artérielle': 'purple',
+				'Industriel': 'red',
+				'Récréative': 'lime',
+				'Agricole': 'yellow',
+				'Rurale': 'yellow',
+				'Multifonctionnelle': 'teal',
+				'Économique spécialisée': 'aqua',
+				'Agricole de conservation': 'olive',
+				'Conservation': 'green'
             };
 
             div.innerHTML += '<h4>Map Legend</h4>';
