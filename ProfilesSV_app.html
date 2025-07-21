@@ -58,6 +58,7 @@
 
     <script>
         // Initialize the map
+		// 
         var map = L.map('map').setView([45.4201, -75.7003], 10);
 
         // Add OpenStreetMap as the base map layer
@@ -161,12 +162,15 @@
         // MODIFICATION: Defined layers using the new reusable function
         // MODIFICATION: Changed "Profiles" to "Predicted Index Vote"
         var baseLayers = {
-            "Profiles & Prediction": profilesLayer,
-            "Affectation du territoire": affectationLayer
+
         };
 
         var groupedOverlays = {
-            "Découpages": {
+            "Main Data Layers": {
+                "Predicted Index Vote": profilesLayer,
+                "Affectation du territoire": affectationLayer
+            },
+			"Découpages": {
                 "Secteurs Administratifs": decoupageLayer,
                 "Districts Électoraux": districtsLayer
             },
