@@ -97,7 +97,7 @@
 
         var profilesLayer = L.geoJSON(null, {
             style: function(feature) {
-                var indexVote = feature.properties.Indice Support AG;
+                var indexVote = feature.properties.IndiceSupportAG;
                 // Reverted to original color scheme and domain as per user's request
                 var colorScale = chroma.scale(['white', 'purple']).domain([20, 60]); 
                 return {
@@ -252,8 +252,8 @@
 				'Récréative': 'lime',
 				'Agricole': 'yellow',
 				'Rurale': 'yellow',
-				'Multifonctionnelle': 'orange',
-				'Économique spécialisée': 'red',
+				'Multifonctionnelle': 'aqua',
+				'Économique spécialisée': 'teal',
 				'Agricole de conservation': 'olive',
 				'Conservation': 'green'
             };
