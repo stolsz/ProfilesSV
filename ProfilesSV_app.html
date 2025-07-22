@@ -172,7 +172,7 @@
 
         var groupedOverlays = {
             "Main Data Layers": {
-                "Predicted Index Vote": profilesLayer,
+                "Profiles": profilesLayer,
                 "Affectation du territoire": affectationLayer
             },
 			"Découpages": {
@@ -262,7 +262,7 @@
 
             // Profiles Layer Legend
             // MODIFICATION: Changed legend title and labels for profiles layer to reflect new bins
-            div.innerHTML += '<h5>Profiles & Prediction</h5>';
+            div.innerHTML += '<h5>Profiles & Indice de Support</h5>';
             // Adjusted legend labels to provide more contrast within the 23-60 range
             var profilesLabels = ['0 - 22', '23 - 30', '31 - 38', '39 - 46', '47 - 54', '55 - 60', '61 - 100'];
             for (var i = 0; i < profilesColors.length; i++) {
