@@ -51,6 +51,20 @@
         .legend-label {
             white-space: nowrap;
         }
+		        /* MODIFICATION: Styles for the Section Vote labels */
+        .section-vote-label {
+            background-color: rgba(255, 255, 255, 0.7); /* Semi-transparent white background */
+            border: 1px solid #333;
+            border-radius: 5px;
+            padding: 2px 5px;
+            font-size: 10px; /* Smaller font size for labels */
+            font-weight: bold;
+            color: #333;
+            text-align: center;
+            white-space: nowrap; /* Prevent text wrapping */
+            pointer-events: none; /* Allow clicks to pass through to map features */
+            transform: translate(-50%, -50%); /* Center the label on its coordinates */
+        }
     </style>
 </head>
 <body>
@@ -94,6 +108,9 @@
         }
         
         // --- Layer Definitions ---
+		
+		// MODIFICATION: Define a new LayerGroup for Section Vote labels
+        var sectionVoteLabelsLayer = L.layerGroup();
 
         var profilesLayer = L.geoJSON(null, {
             style: function(feature) {
@@ -113,6 +130,7 @@
                     }
                     popupContent += '</table>';
                     layer.bindPopup(popupContent, { maxWidth: 500, minWidth: 150 });
+
                 }
             }
         });
@@ -146,8 +164,8 @@
                     case 'Récréative': color = 'lime'; break;
                     case 'Agricole': color = 'yellow'; break;
 					case 'Rurale': color = 'yellow'; break;
-					case 'Multifonctionnelle': color = 'orange'; break;
-					case 'Économique spécialisée': color = 'red'; break;
+					case 'Multifonctionnelle': color = 'aqua'; break;
+					case 'Économique spécialisée': color = 'teal'; break;
 					case 'Agricole de conservation': color = 'olive'; break;
 					case 'Conservation': color = 'green'; break;
                     // MODIFICATION: Corrected bug here (was "color:", should be "color =")
@@ -173,6 +191,7 @@
         var groupedOverlays = {
             "Main Data Layers": {
                 "Profiles": profilesLayer,
+				"Étiquettes Section Vote": sectionVoteLabelsLayer, 
                 "Affectation du territoire": affectationLayer
             },
 			"Découpages": {
@@ -201,6 +220,7 @@
         // Add layers that should be visible by default
         profilesLayer.addTo(map);
         districtsLayer.addTo(map);
+        // sectionVoteLabelsLayer.addTo(map); // Labels are now controlled by zoom level
 
         // Generic data loading function
         function loadGeoJSON(url, onsuccess) {
@@ -214,7 +234,32 @@
         }
 
         // MODIFICATION: Changed GeoJSON file name for profiles layer
-        loadGeoJSON("Profiles_SV_4326_v4.geojson", data => profilesLayer.addData(data));
+//        loadGeoJSON("Profiles_SV_4326_v4.geojson", data => profilesLayer.addData(data));
+        loadGeoJSON("Profiles_SV_4326_v4.geojson", data => {
+            profilesLayer.addData(data);
+            // After data is loaded and the profilesLayer is on the map,
+            // iterate over its features to create and add labels.
+            profilesLayer.eachLayer(function(layer) {
+                if (layer.feature && layer.feature.properties && layer.feature.properties.hasOwnProperty('SectionVote')) {
+                    var sectionVote = layer.feature.properties.SectionVote;
+                    var labelLatLng = layer.getCenter(); 
+
+                    var labelIcon = L.divIcon({
+                        className: 'section-vote-label', 
+                        html: '<div>' + sectionVote + '</div>',
+                        iconSize: [0, 0], 
+                        iconAnchor: [0, 0] 
+                    });
+
+                    var labelMarker = L.marker(labelLatLng, { icon: labelIcon });
+                    sectionVoteLabelsLayer.addLayer(labelMarker);
+                }
+            });
+            // MODIFICATION: Call the function to update label visibility after data is loaded
+            updateLabelVisibility(); 
+        });
+		
+		
         loadGeoJSON('Decoupage_Administratif_4326.geojson', data => decoupageLayer.addData(data));
         loadGeoJSON('Districts_Electoraux_4326.geojson', data => districtsLayer.addData(data));
         loadGeoJSON('Affectation_Territoire_4326.geojson', data => affectationLayer.addData(data));
@@ -308,7 +353,31 @@
         };
 
         legend.addTo(map);
+		
+		
+        // --- MODIFICATION: Label Visibility Control by Zoom Level ---
 
+        // Define the minimum zoom level at which labels should appear
+        // You can adjust this value (e.g., 12, 13, 14) based on your data density and desired visibility.
+        var minLabelZoom = 13; 
+
+        function updateLabelVisibility() {
+            if (map.getZoom() >= minLabelZoom) {
+                if (!map.hasLayer(sectionVoteLabelsLayer)) {
+                    map.addLayer(sectionVoteLabelsLayer);
+                }
+            } else {
+                if (map.hasLayer(sectionVoteLabelsLayer)) {
+                    map.removeLayer(sectionVoteLabelsLayer);
+                }
+            }
+        }
+
+        // Listen for zoom changes and update label visibility
+        map.on('zoomend', updateLabelVisibility);
+
+        // Initial call to set label visibility based on current zoom level
+        // This is called after the profiles data is loaded in the loadGeoJSON callback.
     </script>
 </body>
 </html>
