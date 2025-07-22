@@ -97,7 +97,7 @@
 
         var profilesLayer = L.geoJSON(null, {
             style: function(feature) {
-                var indexVote = feature.properties.Predicted_Mairie_2026_Vote_AG;
+                var indexVote = feature.properties.Indice Support AG;
                 // Reverted to original color scheme and domain as per user's request
                 var colorScale = chroma.scale(['white', 'purple']).domain([20, 60]); 
                 return {
@@ -146,8 +146,8 @@
                     case 'Récréative': color = 'lime'; break;
                     case 'Agricole': color = 'yellow'; break;
 					case 'Rurale': color = 'yellow'; break;
-					case 'Multifonctionnelle': color = 'teal'; break;
-					case 'Économique spécialisée': color = 'aqua'; break;
+					case 'Multifonctionnelle': color = 'orange'; break;
+					case 'Économique spécialisée': color = 'red'; break;
 					case 'Agricole de conservation': color = 'olive'; break;
 					case 'Conservation': color = 'green'; break;
                     // MODIFICATION: Corrected bug here (was "color:", should be "color =")
@@ -172,7 +172,7 @@
 
         var groupedOverlays = {
             "Main Data Layers": {
-                "Projection 2026": profilesLayer,
+                "Predicted Index Vote": profilesLayer,
                 "Affectation du territoire": affectationLayer
             },
 			"Découpages": {
@@ -214,7 +214,7 @@
         }
 
         // MODIFICATION: Changed GeoJSON file name for profiles layer
-        loadGeoJSON("predicted_mairie_2026_vote.geojson", data => profilesLayer.addData(data));
+        loadGeoJSON("Profiles_SV_4326_v4.geojson", data => profilesLayer.addData(data));
         loadGeoJSON('Decoupage_Administratif_4326.geojson', data => decoupageLayer.addData(data));
         loadGeoJSON('Districts_Electoraux_4326.geojson', data => districtsLayer.addData(data));
         loadGeoJSON('Affectation_Territoire_4326.geojson', data => affectationLayer.addData(data));
@@ -252,8 +252,8 @@
 				'Récréative': 'lime',
 				'Agricole': 'yellow',
 				'Rurale': 'yellow',
-				'Multifonctionnelle': 'teal',
-				'Économique spécialisée': 'aqua',
+				'Multifonctionnelle': 'orange',
+				'Économique spécialisée': 'red',
 				'Agricole de conservation': 'olive',
 				'Conservation': 'green'
             };
